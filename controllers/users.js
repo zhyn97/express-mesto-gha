@@ -55,15 +55,15 @@ const createUser = (req, res) => {
     });
 };
 
+// if(about.length < 2 || about.length > 30 || name.length < 2 || name.length > 30){
+//   return res.status(400).send({message : "Переданы некорректные данные"});
+// }else{res.send(user)}
+
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name: name, about: about }, { new: true })
-    .then((user) => {
-      if(about.length < 2 || about.length > 30 || name.length < 2 || name.length > 30){
-        return res.status(400).send({message : "Переданы некорректные данные"});
-      }else{res.send(user)}
-    })
+  User.findByIdAndUpdate(req.user._id, { name: name, about: about }, { new: true, runValidators: true })
+    .then((user) => res.send(user))
     .catch((err) => {
       if(err.name === "ValidationError"){
         return res.status(400).send({message : "Переданы некорректные данные"});
