@@ -60,7 +60,7 @@ const updateUserProfile = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, { name: name, about: about }, { new: true })
     .then((user) => {
-      if(name.length < 2 || name.length > 30){
+      if(about.length < 2 || about.length > 30 || name.length < 2 || name.length > 30){
         return res.status(400).send({message : "Переданы некорректные данные"});
       }else{res.send(user)}
     })
