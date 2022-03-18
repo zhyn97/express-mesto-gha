@@ -2,9 +2,9 @@ const Card = require("../models/card.js");
 
 
 const createCard = (req, res) => {
-  const { name, link, ownerId } = req.body;
+  const { name, link } = req.body;
 
-  Card.create({ name, link, owner: ownerId })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
       if(err.name === "ValidationError"){
@@ -37,13 +37,19 @@ const getCard = (req, res) => {
 
 const deleteCArd = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send(card))
+    .then((card) => {
+      if(card){
+        res.send(card)
+        }else{
+          return res.status(404).send({message : "Запрашиваемый пользователь не найден"})
+        }
+    })
     .catch((err) => {
       if(err.name === "ValidationError"){
         return res.status(400).send({message : "Переданы некорректные данные"});
       }
       if(err.name === "CastError"){
-        return res.status(404).send({message : "Запрашиваемая карточка не найдена"})
+        return res.status(400).send({message : "Запрашиваемая карточка не найдена"})
       }
       if(!err.name === "ValidationError" || !err.name === "CastError"){
         return res.status(500).send({message : "Неизвестная ошибка"})
@@ -57,13 +63,19 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if(card){
+        res.send(card)
+        }else{
+          return res.status(404).send({message : "Запрашиваемый пользователь не найден"})
+        }
+    })
     .catch((err) => {
       if(err.name === "ValidationError"){
         return res.status(400).send({message : "Переданы некорректные данные"});
       }
       if(err.name === "CastError"){
-        return res.status(404).send({message : "Запрашиваемая карточка не найдена"})
+        return res.status(400).send({message : "Запрашиваемая карточка не найдена"})
       }
       if(!err.name === "ValidationError" || !err.name === "CastError"){
         return res.status(500).send({message : "Неизвестная ошибка"})
@@ -77,13 +89,19 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if(card){
+        res.send(card)
+        }else{
+          return res.status(404).send({message : "Запрашиваемый пользователь не найден"})
+        }
+    })
     .catch((err) => {
       if(err.name === "ValidationError"){
         return res.status(400).send({message : "Переданы некорректные данные"});
       }
       if(err.name === "CastError"){
-        return res.status(404).send({message : "Запрашиваемая карточка не найдена"})
+        return res.status(400).send({message : "Запрашиваемая карточка не найдена"})
       }
       if(!err.name === "ValidationError" || !err.name === "CastError"){
         return res.status(500).send({message : "Неизвестная ошибка"})
