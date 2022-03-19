@@ -67,6 +67,9 @@ const updateUserProfile = (req, res) => {
       if(err.name === "CastError"){
         return res.status(404).send({message : "Запрашиваемый пользователь не найден"})
       }
+      if(err.name === "NotFound"){
+        return res.status(404).send({message : "Страница не существует"})
+      }
       if(!err.name === "ValidationError" || !err.name === "CastError"){
         return res.status(500).send({message : "Неизвестная ошибка"})
       }
@@ -100,6 +103,9 @@ const updateAvatar = (req, res) => {
       }
       if(err.name === "CastError"){
         return res.status(404).send({message : "Запрашиваемый пользователь не найден"})
+      }
+      if(err.name === "NotFound"){
+        return res.status(404).send({message : "Страница не существует"})
       }
       if(!err.name === "ValidationError" || !err.name === "CastError"){
         return res.status(500).send({message : "Неизвестная ошибка"})
