@@ -14,7 +14,7 @@ const cardSchema = new mongoose.Schema({
   owner: { // у пользователя есть имя — опишем требования к имени в схеме:
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true
+    required: true,
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +22,7 @@ const cardSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  }
+  },
 });
 
 module.exports = mongoose.model('card', cardSchema);
