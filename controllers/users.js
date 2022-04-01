@@ -47,7 +47,8 @@ const createUser = (req, res, next) => {
           if (!user) {
             throw new BadRequestError('Введены некорректные данные');
           }
-          res.send(user);
+          User.findOne({ _id: user._id })
+            .then((newUser) => res.send(newUser));
         })
         .catch((err) => {
           if (err.code === 11000) {
@@ -70,7 +71,7 @@ const login = (req, res, next) => {
       }
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
 
-      res.send(token);
+      res.send({ user, token });
     })
     .catch(next);
 };
