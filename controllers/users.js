@@ -6,6 +6,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req');
 const BadAuthError = require('../errors/bad-auth');
+const Conflict = require('../errors/conflict');
 
 const getOneUser = (req, res, next) => {
   User.findById(req.params.id)
@@ -52,9 +53,11 @@ const createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.code === 11000) {
-            res
-              .status(409)
-              .send({ message: 'такой email уже существует' });
+            throw new Conflict('такой email уже существует');
+          } else if (err.name === 'ValidationError') {
+            throw new BadRequestError('Ошибка запроса');
+          } else {
+            next(err);
           }
         });
     })
@@ -71,7 +74,7 @@ const login = (req, res, next) => {
       }
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
 
-      res.send({ user, token });
+      res.send({ token });
     })
     .catch(next);
 };
@@ -91,7 +94,13 @@ const updateUserProfile = (req, res, next) => {
 
       res.send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Ошибка запроса');
+      } else {
+        next(err);
+      }
+    });
 };
 
 const deleteUser = (req, res, next) => {
@@ -117,7 +126,13 @@ const updateAvatar = (req, res, next) => {
 
       res.send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Ошибка запроса');
+      } else {
+        next(err);
+      }
+    });
 };
 
 const aboutMe = (req, res, next) => {

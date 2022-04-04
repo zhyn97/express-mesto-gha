@@ -11,31 +11,15 @@ const {
   deleteUser,
   updateAvatar,
   aboutMe,
-  createUser,
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
 
 router.get('/users/me', aboutMe);
 
-router.post('/users', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom((value, helpers) => {
-      if (!regExp.test(value)) {
-        return helpers.error('any.invalid');
-      }
-      return value;
-    }),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
-
 router.get('/users/:id', celebrate({
   params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24),
+    id: Joi.string().length(24).hex().required(),
   }),
 }), getOneUser);
 
@@ -43,14 +27,14 @@ router.delete('/users/:id', deleteUser);
 
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30).required(),
+    about: Joi.string().min(2).max(30).required(),
   }),
 }), updateUserProfile);
 
 router.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().custom((value, helpers) => {
+    avatar: Joi.string().required().custom((value, helpers) => {
       if (!regExp.test(value)) {
         return helpers.error('any.invalid');
       }

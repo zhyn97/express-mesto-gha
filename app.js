@@ -7,6 +7,7 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
+const NotFoundError = require('./errors/not-found-err');
 
 const regExp = /^((ftp|http|https):\/\/)?(www\.)?([A-Za-z0-9]{1}[A-Za-z0-9\-]*\.?)*\.{1}[A-Za-z0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?/;
 
@@ -22,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(3),
+    password: Joi.string().required(),
   }),
 }), login);
 app.post('/signup', celebrate({
@@ -36,7 +37,7 @@ app.post('/signup', celebrate({
       return value;
     }),
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 }), createUser);
 
@@ -45,8 +46,8 @@ app.use(auth);
 app.use('/', users);
 app.use('/', cards);
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+app.use(() => {
+  throw new NotFoundError('Страница не найдена');
 });
 
 app.use(errors());

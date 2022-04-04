@@ -2,6 +2,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req');
+const Forbidden = require('../errors/forbidden');
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -14,7 +15,13 @@ const createCard = (req, res, next) => {
 
       res.send(card);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Ошибка запроса');
+      } else {
+        next(err);
+      }
+    });
 };
 
 const getCard = (req, res, next) => {
@@ -40,7 +47,7 @@ const deleteCArd = (req, res, next) => {
             res.send(card);
           });
       } else {
-        return res.status(403).send({ message: 'Нет прав на удлаение карточки' });
+        throw new Forbidden('Нет прав на удлаение карточки');
       }
     })
     .catch(next);
