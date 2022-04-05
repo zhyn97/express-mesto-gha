@@ -17,7 +17,7 @@ const createCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Ошибка запроса');
+        next(new BadRequestError('Ошибка запроса'));
       } else {
         next(err);
       }
@@ -42,7 +42,7 @@ const deleteCArd = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('карточка не найдена');
       } else if (card.owner.toString() === req.user._id.toString()) {
-        Card.findByIdAndRemove(req.params.id)
+        return Card.findByIdAndRemove(req.params.id)
           .then(() => {
             res.send(card);
           });

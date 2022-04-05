@@ -41,21 +41,21 @@ const createUser = (req, res, next) => {
       if (!validator.isEmail(email)) {
         throw new BadRequestError('Введены некорректные данные');
       }
-      User.create({
+      return User.create({
         name, about, avatar, email, password: hash,
       })
         .then((user) => {
           if (!user) {
             throw new BadRequestError('Введены некорректные данные');
           }
-          User.findOne({ _id: user._id })
+          return User.findOne({ _id: user._id })
             .then((newUser) => res.send(newUser));
         })
         .catch((err) => {
           if (err.code === 11000) {
-            throw new Conflict('такой email уже существует');
+            next(new Conflict('такой email уже существует'));
           } else if (err.name === 'ValidationError') {
-            throw new BadRequestError('Ошибка запроса');
+            next(new BadRequestError('Ошибка запроса'));
           } else {
             next(err);
           }
@@ -96,7 +96,7 @@ const updateUserProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Ошибка запроса');
+        next(new BadRequestError('Ошибка запроса'));
       } else {
         next(err);
       }
@@ -128,7 +128,7 @@ const updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Ошибка запроса');
+        next(new BadRequestError('Ошибка запроса'));
       } else {
         next(err);
       }
